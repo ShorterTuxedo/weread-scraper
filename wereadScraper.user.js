@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Weread Scraper
 // @namespace    https://github.com/Sec-ant/weread-scraper
-// @version      0.4
+// @version      0.5
 // @description  Export Weread books to html file
 // @author       Secant
 // @match        https://weread.qq.com/web/reader/*
@@ -67,8 +67,8 @@
     }
 
     // turn to next page
-    const nextPage = document.querySelector(".readerFooter_button");
-    if (contentFound && nextPage && !timeoutIsSet) {
+    const nextPageButton = document.querySelector(".readerFooter_button");
+    if (contentFound && nextPageButton && !timeoutIsSet) {
       contentFound = false;
       timeoutIsSet = true;
       // sleep for {click interval} ms
@@ -78,10 +78,13 @@
         }, getClickInterval());
       });
       timeoutIsSet = false;
+      // the next page button before sleeping will get unmounted in some cases
+      // so we'll need to re-query it after sleeping
+      const newNextPageButton = document.querySelector(".readerFooter_button");
       if (abortTimeout) {
         abortTimeout = false;
       } else {
-        nextPage.dispatchEvent(
+        newNextPageButton.dispatchEvent(
           new MouseEvent("click", {
             clientX: 1,
             clientY: 1,
