@@ -1,0 +1,39 @@
+{
+  "name": "weread-scraper",
+  "version": "1.0.0",
+  "description": "Scrape WeRead books and save them as HTML files",
+  "keywords": [
+    "weread",
+    "userscript",
+    "ebook"
+  ],
+  "homepage": "https://github.com/Sec-ant/weread-scraper",
+  "repository": "https://github.com/Sec-ant/weread-scraper.git",
+  "bugs": "https://github.com/Sec-ant/weread-scraper/issues",
+  "license": "MIT",
+  "private": false,
+  "author": "Ze-Zheng Wu",
+  "type": "module",
+  "files": [
+    "dist",
+    "!dist/fonts",
+    "dist/fonts/*.woff2"
+  ],
+  "browser": "dist/weread-scraper.user.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@types/html-minifier-terser": "^7.0.0",
+    "@types/wicg-file-system-access": "^2020.9.6",
+    "typescript": "^5.0.4",
+    "vite": "^4.3.5",
+    "vite-plugin-monkey": "^3.2.0"
+  },
+  "dependencies": {
+    "html-minifier-terser": "^7.2.0",
+    "zustand": "^4.3.8"
+  }
+}
