@@ -25,3 +25,4 @@ dist-ssr
 
 **/fonts/*
 !**/fonts/*.woff2
+*.tgz
