@@ -6,11 +6,11 @@
 
 1. 在 [Tampermonkey](https://www.tampermonkey.net/) 中安装[这个脚本](https://greasyfork.org/zh-CN/scripts/450169-weread-scraper)
 
-2. 在[微信阅读网页版](https://weread.qq.com/)选择你想要保存的书籍，通过**开始阅读**阅读按钮浏览到书籍的首页（如：[《永恒的终结》](https://weread.qq.com/web/reader/f6432a905b73c0f64797a8d)），或通过目录选择书中的某一页
+2. 在[微信阅读网页版](https://weread.qq.com/)选择你想要保存的书籍，通过**开始阅读**按钮浏览到书籍的首页（如：[《永恒的终结》](https://weread.qq.com/web/reader/f6432a905b73c0f64797a8d)），或通过目录选择书中的某一页
 
 3. 左键单击 Tampermonkey 浏览器扩展图标，并点击弹出菜单中的 **Start Scraping**
 
-4. 等待内容抓取过程结束，结束后将自动保存一份 HTML 文档到本地
+4. 等待内容抓取过程结束，结束后脚本将自动保存一份 HTML 文档到本地
 
 5. 点击 **Cancel Scraping** 可以取消当前的抓取过程
 
@@ -42,4 +42,4 @@
 
 6. **我该如何把 HTML 文件转换为 PDF 文件？**
 
-   推荐使用[火狐浏览器](http://www.firefox.com/)打开保存下来的 HTML 文件，并通过浏览器的打印功能将其打印为 PDF 文件。其他浏览器也可以尝试，但是火狐浏览器在打印大量页面时速度表现会比较出色，不容易出现卡顿。你也可以尝试使用 [Pandoc](https://pandoc.org/)，它支持非常多样的文档格式转换。
+   推荐使用[火狐浏览器](http://www.firefox.com/)打开保存下来的 HTML 文件，并通过浏览器的打印功能将其打印为 PDF 文件。其他浏览器也可以尝试，但是火狐浏览器在打印大量页面时速度表现会更出色，不容易出现卡顿。你也可以尝试使用 [Pandoc](https://pandoc.org/)，它支持非常多样的文档格式转换。
