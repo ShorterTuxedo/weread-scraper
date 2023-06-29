@@ -97,7 +97,9 @@ const scraperPageInitialState: ScraperPageState = {
   preRenderContainer: null,
   pageContentLoaded: false,
   timeout: 0,
-  pageContentLoadedCleanUp: () => {},
+  pageContentLoadedCleanUp: () => {
+    /* void */
+  },
 };
 
 const scraperPageStore = createStore<ScraperPageState>()(
@@ -150,7 +152,9 @@ function scrapingOff() {
         },
       },
     ],
-    () => {}
+    () => {
+      /* void */
+    }
   );
 }
 
