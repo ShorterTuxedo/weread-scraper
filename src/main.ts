@@ -108,7 +108,7 @@ const scraperPageStore = createStore<ScraperPageState>()(
 
 // 开始抓取书籍内容时应该执行的函数
 function scrapingOn() {
-  // 阻截微信阅读的 read 请求，避免抓取过程中的翻页信息被记录为阅读进度
+  // 阻截微信读书的 read 请求，避免抓取过程中的翻页信息被记录为阅读进度
   // 同时为 read 请求增加一个回调，表示此时页面已经加载完毕
   GM_webRequest(
     [
@@ -139,7 +139,7 @@ function scrapingOff() {
   scraperPageStore.getState().pageContentLoadedCleanUp();
   // 停止监测文档中的 preRenderContainer 元素
   preRenderContainerObserver.disconnect();
-  // 恢复微信阅读的 read 请求
+  // 恢复微信读书的 read 请求
   GM_webRequest(
     [
       {
@@ -218,7 +218,7 @@ function subscribePageContentLoaded() {
       // TODO: 待证实
       nextPageButton = document.querySelector(".readerFooter_button");
       // 给下一页按钮施加一个点击操作，这里要注意 clientX 和 clientY 必须不为 0
-      // 否则微信阅读会将其判断为非人为翻页从而不执行翻页操作
+      // 否则微信读书会将其判断为非人为翻页从而不执行翻页操作
       nextPageButton?.dispatchEvent(
         new MouseEvent("click", {
           clientX: 1,
@@ -367,7 +367,7 @@ function collapseSpans(element: Element) {
 }
 
 // helper 函数用于将内容保存至本地
-function saveContent(content: string, fileName = "微信阅读") {
+function saveContent(content: string, fileName = "微信读书") {
   const contentBlob = new Blob([content], {
     type: "text/html;charset=utf-8",
   });
