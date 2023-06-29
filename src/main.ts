@@ -328,12 +328,12 @@ function setClickInterval() {
   });
 }
 
-// helper 函数用于移除所有 "data-" 开头的属性
+// helper 函数用于移除所有 "data-wr-id" 和 "data-wr-co" 属性
 function recursivelyRemoveDataAttr(element: Element) {
   const attributes = element.attributes;
   for (let i = attributes.length - 1; i >= 0; --i) {
     const attributeName = attributes[i].name;
-    if (attributeName.startsWith("data-")) {
+    if (["data-wr-id", "data-wr-co"].includes(attributeName)) {
       element.removeAttribute(attributeName);
     }
   }
