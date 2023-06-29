@@ -1,6 +1,6 @@
 {
   "name": "weread-scraper",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Scrape WeRead books and save them as HTML files",
   "keywords": [
     "weread",
@@ -30,9 +30,9 @@
     "@typescript-eslint/parser": "^5.60.1",
     "eslint": "^8.43.0",
     "eslint-plugin-compat": "^4.1.4",
-    "typescript": "^5.0.4",
-    "vite": "^4.3.5",
-    "vite-plugin-monkey": "^3.2.0"
+    "typescript": "^5.1.6",
+    "vite": "^4.3.9",
+    "vite-plugin-monkey": "^3.2.2"
   },
   "dependencies": {
     "html-minifier-terser": "^7.2.0",
