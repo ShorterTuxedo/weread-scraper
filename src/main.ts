@@ -253,11 +253,11 @@ async function feed(preRenderContainer: Element) {
       );
       styleElement.append(".preRenderContent { page-break-after: always; }");
       styleElement.prepend(
-        `@font-face { font-family: "汉仪旗黑50S"; src: url("https://fastly.jsdelivr.net/npm/weread-scraper@${VERSION}/dist/fonts/HYQiHei_50S.woff2") format("woff2"); }`,
-        `@font-face { font-family: "汉仪旗黑65S"; src: url("https://fastly.jsdelivr.net/npm/weread-scraper@${VERSION}/dist/fonts/HYQiHei_65S.woff2") format("woff2"); }`,
-        `@font-face { font-family: "汉仪楷体"; src: url("https://fastly.jsdelivr.net/npm/weread-scraper@${VERSION}/dist/fonts/HYKaiTiS.woff2") format("woff2"); }`,
-        `@font-face { font-family: "方正仿宋"; src: url("https://fastly.jsdelivr.net/npm/weread-scraper@${VERSION}/dist/fonts/FZFSJW.woff2") format("woff2"); }`,
-        `@font-face { font-family: "PingFang SC"; src: url("https://fastly.jsdelivr.net/npm/weread-scraper@${VERSION}/dist/fonts/PingFang-SC-Regular.woff2") format("woff2"); }`
+        `@font-face { font-family: "汉仪旗黑50S"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_50S.woff2") format("woff2"); }`,
+        `@font-face { font-family: "汉仪旗黑65S"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_65S.woff2") format("woff2"); }`,
+        `@font-face { font-family: "汉仪楷体"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYKaiTiS.woff2") format("woff2"); }`,
+        `@font-face { font-family: "方正仿宋"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/FZFSJW.woff2") format("woff2"); }`,
+        `@font-face { font-family: "PingFang SC"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/PingFang-SC-Regular.woff2") format("woff2"); }`
       );
       styleElement.outerHTML = await minify(styleElement.outerHTML, {
         minifyCSS: true,

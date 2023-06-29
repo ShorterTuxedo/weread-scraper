@@ -15,9 +15,7 @@
   "author": "Ze-Zheng Wu",
   "type": "module",
   "files": [
-    "dist",
-    "!dist/fonts",
-    "dist/fonts/*.woff2"
+    "dist"
   ],
   "browser": "dist/weread-scraper.user.js",
   "scripts": {

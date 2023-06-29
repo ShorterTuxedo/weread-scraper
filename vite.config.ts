@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
 import monkey, { cdn } from "vite-plugin-monkey";
-import { version } from "./package.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: false,
   plugins: [
     monkey({
       build: {
@@ -34,7 +34,4 @@ export default defineConfig({
       },
     }),
   ],
-  define: {
-    VERSION: JSON.stringify(version),
-  },
 });
