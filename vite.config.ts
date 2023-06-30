@@ -8,6 +8,14 @@ export default defineConfig({
     monkey({
       build: {
         externalGlobals: {
+          "zustand/vanilla": cdn.jsdelivrFastly(
+            "zustandVanilla",
+            "umd/vanilla.production.js"
+          ),
+          "zustand/middleware": cdn.jsdelivrFastly(
+            "zustandMiddleware",
+            "umd/middleware.production.js"
+          ),
           "html-minifier-terser": cdn.jsdelivrFastly(
             "HTMLMinifier",
             "dist/htmlminifier.umd.bundle.min.js"
