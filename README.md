@@ -1,10 +1,13 @@
 # WeRead Scraper
 
+[![npm](https://img.shields.io/npm/v/weread-scraper)](https://www.npmjs.com/package/weread-scraper/v/latest)
+[![Greasy Fork](https://img.shields.io/greasyfork/v/450169)](https://greasyfork.org/scripts/450169@latest)
+
 将微信读书书籍内容导出为 HTML 文件
 
 ## 使用方法
 
-1. 在 [Tampermonkey](https://www.tampermonkey.net/) 中安装[这个脚本](https://greasyfork.org/scripts/450169-weread-scraper)
+1. 在 [Tampermonkey](https://www.tampermonkey.net/) 中安装[这个脚本](https://greasyfork.org/scripts/450169@latest)
 
 2. 在[微信读书网页版](https://weread.qq.com/)选择你想要保存的书籍，通过**开始阅读**按钮浏览到书籍的首页（如：[《永恒的终结》](https://weread.qq.com/web/reader/f6432a905b73c0f64797a8d)），或通过目录选择书中的某一页
 
@@ -77,4 +80,4 @@ npm run build
 
     jsDelivr: https://cdn.jsdelivr.net/npm/weread-scraper@latest/dist/weread-scraper.user.js
 
-    Greasy Fork: https://greasyfork.org/scripts/450169-weread-scraper@latest/code/weread-scraper.user.js
+    Greasy Fork: https://greasyfork.org/scripts/450169@latest/code/weread-scraper.user.js
