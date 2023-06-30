@@ -16,6 +16,7 @@ export default defineConfig({
       },
       entry: "src/main.ts",
       userscript: {
+        name: "WeRead Scraper",
         icon: "https://weread.qq.com/favicon.ico",
         namespace: "https://github.com/Sec-ant/weread-scraper",
         match: [
