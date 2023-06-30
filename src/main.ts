@@ -86,10 +86,11 @@ const scraperGMStore = createStore<ScraperGMState>()(
   })
 );
 
-// 内存 storage 用来存取关于页面的一些状态信息
+// 页面 storage 用来存取关于页面的一些状态信息（翻页前和结束抓取时会被重置）
 interface ScraperPageState {
   preRenderContainer: Element | null;
   pageContentLoaded: boolean;
+  isNewChapter: boolean;
   timeout: number;
   pageContentLoadedCleanUp: () => void;
 }
@@ -97,6 +98,7 @@ interface ScraperPageState {
 const scraperPageInitialState: ScraperPageState = {
   preRenderContainer: null,
   pageContentLoaded: false,
+  isNewChapter: false,
   timeout: 0,
   pageContentLoadedCleanUp: () => {
     /* void */
@@ -109,17 +111,34 @@ const scraperPageStore = createStore<ScraperPageState>()(
 
 // 开始抓取书籍内容时应该执行的函数
 function scrapingOn() {
-  // 阻截微信读书的 read 请求，避免抓取过程中的翻页信息被记录为阅读进度
-  // 同时为 read 请求增加一个回调，表示此时页面已经加载完毕
   GM_webRequest(
     [
+      // 阻截微信读书的阅读进度请求，避免抓取过程中的翻页信息被记录为阅读进度
+      // 发出这个请求表示此时页面已经加载完毕
       {
         selector: "https://weread.qq.com/web/book/read*",
         action: "cancel",
       },
+      // 订阅微信读书的章节内容获取请求
+      // 发出这个请求表示内容为新章节，否则为接续页
+      {
+        selector: "https://weread.qq.com/web/book/chapter/e_*",
+        action: {
+          redirect: {
+            from: ".*",
+            to: "$&",
+          },
+        },
+      },
     ],
-    () => {
-      scraperPageStore.setState({ pageContentLoaded: true });
+    (_, __, { url }) => {
+      if (url.startsWith("https://weread.qq.com/web/book/read")) {
+        scraperPageStore.setState({ pageContentLoaded: true });
+      } else if (url.startsWith("https://weread.qq.com/web/book/chapter/e_")) {
+        scraperPageStore.setState({
+          isNewChapter: true,
+        });
+      }
     }
   );
   // 开始监测文档中的 preRenderContainer 元素
@@ -127,7 +146,7 @@ function scrapingOn() {
     childList: true,
     subtree: true,
   });
-  // 订阅页面加载完毕事件，添加相应的回调函数，并生成清理函数
+  // 订阅页面加载完毕事件，添加相应的回调函数，并存储相应的收尾函数
   const unsub = subscribePageContentLoaded();
   scraperPageStore.setState({
     pageContentLoadedCleanUp: getPageContentLoadedCleanUpFunction(unsub),
@@ -140,23 +159,10 @@ function scrapingOff() {
   scraperPageStore.getState().pageContentLoadedCleanUp();
   // 停止监测文档中的 preRenderContainer 元素
   preRenderContainerObserver.disconnect();
-  // 恢复微信读书的 read 请求
-  GM_webRequest(
-    [
-      {
-        selector: "https://weread.qq.com/web/book/read*",
-        action: {
-          redirect: {
-            from: ".*",
-            to: "$&",
-          },
-        },
-      },
-    ],
-    () => {
-      /* void */
-    }
-  );
+  // 取消订阅微信读书的阅读进度请求和章节内容获取请求
+  GM_webRequest([], () => {
+    /* void */
+  });
 }
 
 // 订阅抓取状态，并根据状态执行相应的函数
@@ -210,9 +216,7 @@ function subscribePageContentLoaded() {
         });
       });
       // 清空页面加载完毕状态
-      scraperPageStore.setState({
-        pageContentLoaded: false,
-      });
+      scraperPageStore.setState(scraperPageInitialState);
       // 重新获取下一页按钮
       // 如果不重新获取，这个按钮有可能会被重新渲染
       // 那么原来获取到的按钮会从文档中消失，导致无法翻页

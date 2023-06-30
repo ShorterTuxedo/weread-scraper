@@ -30,6 +30,7 @@ export default defineConfig({
         match: [
           "https://weread.qq.com/web/reader/*",
           "https://weread.qq.com/web/book/read*",
+          "https://weread.qq.com/web/book/chapter/e_*",
         ],
         grant: [
           "unsafeWindow",
