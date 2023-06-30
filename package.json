@@ -1,6 +1,6 @@
 {
   "name": "weread-scraper",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Scrape WeRead books and save them as HTML files",
   "keywords": [
     "weread",
