@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/weread-scraper)](https://www.npmjs.com/package/weread-scraper/v/latest)
 [![Greasy Fork](https://img.shields.io/greasyfork/v/450169)](https://greasyfork.org/scripts/450169@latest)
 
-[英文介绍](README.en.md)
+[In English](README.en.md)
 
 将微信读书书籍内容导出为 HTML 文件
 
