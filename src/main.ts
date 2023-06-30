@@ -16,10 +16,11 @@ import { minify } from "html-minifier-terser";
 
 // 初始化用来存储书籍内容的元素
 const htmlElement = document.createElement("html");
+const headElement = document.createElement("head");
 const styleElement = document.createElement("style");
 const bodyElement = document.createElement("body");
-htmlElement.append(styleElement);
-htmlElement.append(bodyElement);
+headElement.append(styleElement);
+htmlElement.append(headElement, bodyElement);
 
 // 初始化一个 Mutation Observer 用来监测书籍页面内容 DOM 元素 preRenderContainer 的出现
 const preRenderContainerObserver = new MutationObserver(async () => {
