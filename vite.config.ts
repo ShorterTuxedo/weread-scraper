@@ -33,7 +33,6 @@ export default defineConfig({
           "https://weread.qq.com/web/book/chapter/e_*",
         ],
         grant: [
-          "unsafeWindow",
           "GM_registerMenuCommand",
           "GM_getValue",
           "GM_setValue",
