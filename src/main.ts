@@ -14,6 +14,40 @@ import {
 } from "zustand/middleware";
 import { minify } from "html-minifier-terser";
 
+// 辅助 prettier 格式化
+const css = String.raw;
+// 预设样式
+const stylePreset = css`
+  @font-face {
+    font-family: "汉仪旗黑50S";
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_50S.woff2")
+      format("woff2");
+  }
+  @font-face {
+    font-family: "汉仪旗黑65S";
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_65S.woff2")
+      format("woff2");
+  }
+  @font-face {
+    font-family: "汉仪楷体";
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYKaiTiS.woff2")
+      format("woff2");
+  }
+  @font-face {
+    font-family: "方正仿宋";
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/FZFSJW.woff2")
+      format("woff2");
+  }
+  @font-face {
+    font-family: "PingFang SC";
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/PingFang-SC-Regular.woff2")
+      format("woff2");
+  }
+  .readerChapterContent {
+    break-after: page;
+  }
+`;
+
 // 初始化用来存储书籍内容的元素
 const htmlElement = document.createElement("html");
 const headElement = document.createElement("head");
@@ -249,21 +283,13 @@ function getPageContentLoadedCleanUpFunction(unsub: () => void) {
 
 // 将获取到的 preRenderContainer 中的内容稍作变换并存入目标位置
 async function feed(preRenderContainer: Element) {
+  // 样式处理，样式表只添加一次即可
   if (styleElement.childNodes.length === 0) {
-    const style = preRenderContainer.querySelector("style");
-    if (style?.childNodes.length) {
-      styleElement.innerHTML = style.innerHTML.replaceAll(
-        ".readerChapterContent",
-        ".preRenderContent"
-      );
-      styleElement.append(".preRenderContent { page-break-after: always; }");
-      styleElement.prepend(
-        `@font-face { font-family: "汉仪旗黑50S"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_50S.woff2") format("woff2"); }`,
-        `@font-face { font-family: "汉仪旗黑65S"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_65S.woff2") format("woff2"); }`,
-        `@font-face { font-family: "汉仪楷体"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYKaiTiS.woff2") format("woff2"); }`,
-        `@font-face { font-family: "方正仿宋"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/FZFSJW.woff2") format("woff2"); }`,
-        `@font-face { font-family: "PingFang SC"; src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/PingFang-SC-Regular.woff2") format("woff2"); }`
-      );
+    const preRenderStyleElement = preRenderContainer.querySelector("style");
+    if (preRenderStyleElement?.childNodes.length) {
+      // 添加预设样式和微信读书样式
+      styleElement.append(stylePreset, preRenderStyleElement.innerHTML);
+      // 对样式进行 minification
       styleElement.outerHTML = await minify(styleElement.outerHTML, {
         minifyCSS: true,
       });
