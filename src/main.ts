@@ -300,22 +300,46 @@ async function feed(preRenderContainer: Element) {
       });
     }
   }
+  // 内容处理
   const preRenderContent = preRenderContainer.querySelector(
     "#preRenderContent"
   ) as Element;
-  preRenderContent.removeAttribute("id");
+  // 替换图片链接
+  // TODO: 图片大小似乎和窗口大小有关，是否应该固定为一个定值？
   for (const image of preRenderContent.querySelectorAll("img")) {
     image.src = image.getAttribute("data-src") ?? image.src;
   }
+  // 移除一些 "data-" 开头的无用的属性
   recursivelyRemoveDataAttr(preRenderContent);
+  // 将多个连续的 span 元素合并为一个，减少文件体积
   collapseSpans(preRenderContent);
-  bodyElement.insertAdjacentHTML(
-    "beforeend",
-    await minify(preRenderContent.outerHTML, {
-      collapseWhitespace: true,
-      removeComments: true,
-    })
-  );
+  // 如果是新章节，页面内容连带容器经过 minification 后插入到 body 元素最后
+  if (scraperPageStore.getState().isNewChapter) {
+    // 移除重复的 id
+    preRenderContent.removeAttribute("id");
+    // 添加章节内容 class 用于应用作用于章节的样式
+    preRenderContent.classList.add("readerChapterContent");
+    // 将这个章节容器插入到 body 末尾
+    bodyElement.insertAdjacentHTML(
+      "beforeend",
+      await minify(preRenderContent.outerHTML, {
+        collapseWhitespace: true,
+        removeComments: true,
+      })
+    );
+  }
+  // 如果不是新章节，页面内容 minification 后插入到最后一个容器最后
+  // TODO: 是否应该合并 <div data-wr-bd="1"> ?
+  else {
+    // 将容器内容插入到最后一个章节容器末尾
+    bodyElement.lastElementChild?.insertAdjacentHTML(
+      "beforeend",
+      await minify(preRenderContent.innerHTML, {
+        collapseWhitespace: true,
+        removeComments: true,
+      })
+    );
+  }
 }
 
 // 添加一个开启抓取的按钮
