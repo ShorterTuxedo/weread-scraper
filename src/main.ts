@@ -165,13 +165,18 @@ function scrapingOn() {
         },
       },
     ],
-    (_, __, { url }) => {
-      if (url.startsWith("https://weread.qq.com/web/book/read")) {
-        scraperPageStore.setState({ pageContentLoaded: true });
-      } else if (url.startsWith("https://weread.qq.com/web/book/chapter/e_")) {
-        scraperPageStore.setState({
-          isNewChapter: true,
-        });
+    (info) => {
+      switch (info) {
+        case "cancel":
+          scraperPageStore.setState({
+            pageContentLoaded: true,
+          });
+          break;
+        case "redirect":
+          scraperPageStore.setState({
+            isNewChapter: true,
+          });
+          break;
       }
     }
   );
