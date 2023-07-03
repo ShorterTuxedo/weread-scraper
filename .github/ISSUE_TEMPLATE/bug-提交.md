@@ -1,8 +1,8 @@
 ---
 name: Bug 提交
 about: 通过提交 Bug 来帮助完善这个脚本
-title: "[BUG]"
-labels: ''
+title: ''
+labels: bug
 assignees: ''
 
 ---
