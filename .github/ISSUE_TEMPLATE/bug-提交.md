@@ -1,10 +1,9 @@
 ---
 name: Bug 提交
 about: 通过提交 Bug 来帮助完善这个脚本
-title: ''
+title: ""
 labels: bug
-assignees: ''
-
+assignees: ""
 ---
 
 **关于 Bug 的描述**
