@@ -13,9 +13,8 @@ import {
   subscribeWithSelector,
 } from "zustand/middleware";
 import { minify } from "html-minifier-terser";
+import { html, css } from "code-tag";
 
-// 辅助 prettier 格式化
-const css = String.raw;
 // 预设样式
 const stylePreset = css`
   @font-face {
@@ -53,6 +52,7 @@ const htmlElement = document.createElement("html");
 const headElement = document.createElement("head");
 const styleElement = document.createElement("style");
 const bodyElement = document.createElement("body");
+headElement.insertAdjacentHTML("beforeend", html`<meta charset="utf-8" />`);
 headElement.append(styleElement);
 htmlElement.append(headElement, bodyElement);
 
@@ -364,7 +364,7 @@ async function stopScrapingAndSave() {
     scraping: false,
   });
   saveContent(
-    htmlElement.outerHTML,
+    html`<!DOCTYPE html>` + htmlElement.outerHTML,
     document
       .querySelector(".readerCatalog_bookInfo_title_txt")
       ?.textContent?.trim()
