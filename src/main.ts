@@ -159,8 +159,8 @@ function scrapingOn() {
         selector: "https://weread.qq.com/web/book/chapter/e_*",
         action: {
           redirect: {
-            from: ".*",
-            to: "$&",
+            from: "(.*)",
+            to: "$1",
           },
         },
       },
