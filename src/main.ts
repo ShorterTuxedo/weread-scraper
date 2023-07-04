@@ -44,6 +44,8 @@ const stylePreset = css`
   }
   .readerChapterContent {
     break-after: page;
+    /* 支持旧版本浏览器 */
+    page-break-after: always;
   }
 `;
 
