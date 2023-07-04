@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/weread-scraper)](https://www.npmjs.com/package/weread-scraper/v/latest)
 [![Greasy Fork](https://img.shields.io/greasyfork/v/450169)](https://greasyfork.org/scripts/450169@latest)
+[![Greasy Fork](https://img.shields.io/greasyfork/dt/450169)](https://greasyfork.org/scripts/450169@latest)
 
 [In English](README.en.md)
 
