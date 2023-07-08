@@ -1,10 +1,12 @@
 import {
-  GM_deleteValue,
   GM_getValue,
-  GM_registerMenuCommand,
   GM_setValue,
+  GM_deleteValue,
+  GM_registerMenuCommand,
+  GM_unregisterMenuCommand,
   GM_webRequest,
 } from "$";
+import GM_fetch from "@trim21/gm-fetch";
 import { createStore } from "zustand/vanilla";
 import {
   persist,
@@ -16,6 +18,7 @@ import { minify } from "html-minifier-terser";
 import { html, css } from "code-tag";
 
 // 预设样式
+// TODO: Prevent images from spanning across pages
 const stylePreset = css`
   @font-face {
     font-family: "汉仪旗黑50S";
@@ -94,7 +97,7 @@ const scraperSessionStore = createStore<ScraperSessionState>()(
   )
 );
 
-// GM storage 用来存取用户设定的翻页时间间隔（毫秒）
+// GM storage 用来存取用户设定：翻页时间间隔（毫秒）、是否内联图片
 const GMStorage: StateStorage = {
   getItem: (name: string): string | null => {
     return GM_getValue(name);
@@ -107,19 +110,33 @@ const GMStorage: StateStorage = {
   },
 };
 
+interface BooleanOption {
+  name: string;
+  value: boolean;
+}
+
 interface ScraperGMState {
   clickInterval: number;
+  booleanOptions: BooleanOption[];
 }
 
 const scraperGMInitialState: ScraperGMState = {
   clickInterval: 0,
+  booleanOptions: [
+    {
+      name: "Inline Images",
+      value: false,
+    },
+  ],
 };
 
 const scraperGMStore = createStore<ScraperGMState>()(
-  persist(() => scraperGMInitialState, {
-    name: "scraper-gm-storage",
-    storage: createJSONStorage(() => GMStorage),
-  })
+  subscribeWithSelector(
+    persist(() => scraperGMInitialState, {
+      name: "scraper-gm-storage",
+      storage: createJSONStorage(() => GMStorage),
+    })
+  )
 );
 
 // 页面 storage 用来存取关于页面的一些状态信息（翻页前和结束抓取时会被重置）
@@ -306,11 +323,42 @@ async function feed(preRenderContainer: Element) {
   const preRenderContent = preRenderContainer.querySelector(
     "#preRenderContent"
   ) as Element;
+
   // 替换图片链接
-  // TODO: 图片大小似乎和窗口大小有关，是否应该固定为一个定值？
-  for (const image of preRenderContent.querySelectorAll("img")) {
-    image.src = image.getAttribute("data-src") ?? image.src;
+  // 如果开启了内联图片，则抓取时会下载图片并将图片链接替换为 Base64 格式的 DataURL
+  if (scraperGMStore.getState().booleanOptions[0].value) {
+    const fetchImagePromises: Promise<void>[] = [];
+    for (const image of preRenderContainer.querySelectorAll("img")) {
+      const url = image.getAttribute("data-src") ?? image.src;
+      if (!url) {
+        continue;
+      }
+      fetchImagePromises.push(
+        (async () => {
+          try {
+            const resp = await GM_fetch(url);
+            if (resp.ok) {
+              const imageBlob = await resp.blob();
+              const imageDataUrl = await blobToBase64(imageBlob);
+              image.src = imageDataUrl;
+            }
+          } catch (e) {
+            console.warn(`image (${url}) failed to fetch: ${e}`);
+          }
+        })()
+      );
+    }
+    await Promise.all(fetchImagePromises);
   }
+  // 如果未开启内联图片，则不会下载图片，并保留外链链接（默认行为）
+  else {
+    for (const image of preRenderContainer.querySelectorAll("img")) {
+      image.src = image.getAttribute("data-src") ?? image.src;
+    }
+  }
+
+  // TODO: 图片大小似乎和窗口大小有关，是否应该固定为一个定值？
+
   // 移除一些 "data-" 开头的无用的属性
   recursivelyRemoveDataAttr(preRenderContent);
   // 将多个连续的 span 元素合并为一个，减少文件体积
@@ -390,6 +438,39 @@ function setClickInterval() {
   });
 }
 
+// 为二值化选项添加菜单按钮和逻辑
+scraperGMStore.subscribe<BooleanOption[]>(
+  (state) => state.booleanOptions,
+  (() => {
+    const menuIds: unknown[] = [];
+    return (booleanOptions) => {
+      for (let i = 0; i < booleanOptions.length; ++i) {
+        if (typeof menuIds[i] !== "undefined") {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          GM_unregisterMenuCommand(menuIds[0]);
+        }
+        menuIds[i] = GM_registerMenuCommand(
+          `${booleanOptions[i].name} ${booleanOptions[i].value ? "✔" : "✘"}`,
+          () => {
+            toggleBooleanOptions(i);
+          }
+        );
+      }
+    };
+  })(),
+  {
+    fireImmediately: true,
+  }
+);
+function toggleBooleanOptions(index: number) {
+  const nextBooleanOptions = [...scraperGMStore.getState().booleanOptions];
+  nextBooleanOptions[index].value = !nextBooleanOptions[index].value;
+  scraperGMStore.setState({
+    booleanOptions: nextBooleanOptions,
+  });
+}
+
 // helper 函数用于移除所有 "data-wr-id" 和 "data-wr-co" 属性
 function recursivelyRemoveDataAttr(element: Element) {
   const attributes = element.attributes;
@@ -440,4 +521,13 @@ function saveContent(content: string, fileName = "微信读书") {
   dummyLink.click();
   document.body.removeChild(dummyLink);
   URL.revokeObjectURL(dummyLink.href);
+}
+
+// helper 函数用于将 Blob 转换为 Base64 字符串
+async function blobToBase64(blob: Blob) {
+  return await new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
 }

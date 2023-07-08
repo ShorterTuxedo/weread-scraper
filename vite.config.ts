@@ -22,6 +22,10 @@ export default defineConfig({
             "HTMLMinifier",
             "dist/htmlminifier.umd.bundle.min.js"
           ),
+          "@trim21/gm-fetch": cdn.jsdelivrFastly(
+            "GM_fetch",
+            "dist/gm_fetch.min.js"
+          ),
         },
       },
       entry: "src/main.ts",
@@ -36,11 +40,14 @@ export default defineConfig({
         ],
         grant: [
           "GM_registerMenuCommand",
+          "GM_unregisterMenuCommand",
           "GM_getValue",
           "GM_setValue",
           "GM_deleteValue",
           "GM_webRequest",
+          "GM_xmlhttpRequest",
         ],
+        connect: ["weread.qq.com", "*"],
         "run-at": "document-start",
       },
     }),
