@@ -387,8 +387,6 @@ async function feed(preRenderContainer: Element) {
     }
   }
 
-  // TODO: 图片大小似乎和窗口大小有关，是否应该固定为一个定值？
-
   // 移除一些 "data-" 开头的无用的属性
   recursivelyRemoveDataAttr(preRenderContent);
   // 将多个连续的 span 元素合并为一个，减少文件体积
