@@ -253,7 +253,7 @@ function subscribePageContentLoaded() {
           preRenderContainer.cloneNode(true) as typeof preRenderContainer
         );
       } else {
-        console.warn("内容丢失");
+        console.warn("Failed to find .preRenderContainer element.");
       }
       // 寻找是否有下一页按钮
       let nextPageButton = document.querySelector(".readerFooter_button");
