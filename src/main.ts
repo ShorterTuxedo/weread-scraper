@@ -328,6 +328,7 @@ async function feed(preRenderContainer: Element) {
   // 如果开启了内联图片，则抓取时会下载图片并将图片链接替换为 Base64 格式的 DataURL
   if (scraperGMStore.getState().booleanOptions[0].value) {
     const fetchImagePromises: Promise<void>[] = [];
+    const backgroundImageRegExp = /(?<=background-image:url\().+?(?=\))/;
     for (const image of preRenderContainer.querySelectorAll("img")) {
       const url = image.getAttribute("data-src") ?? image.src;
       if (!url) {
@@ -343,7 +344,36 @@ async function feed(preRenderContainer: Element) {
               image.src = imageDataUrl;
             }
           } catch (e) {
-            console.warn(`image (${url}) failed to fetch: ${e}`);
+            console.warn(`Failed to fetch image (${url}): ${e}`);
+          }
+        })()
+      );
+    }
+    for (const element of preRenderContainer.querySelectorAll(
+      '[style*="background-image:url("]'
+    )) {
+      const styleAttribute = element.getAttribute("style");
+      if (!styleAttribute) {
+        continue;
+      }
+      const url = styleAttribute?.match(backgroundImageRegExp)?.[0];
+      if (!url) {
+        continue;
+      }
+      fetchImagePromises.push(
+        (async () => {
+          try {
+            const resp = await GM_fetch(url);
+            if (resp.ok) {
+              const imageBlob = await resp.blob();
+              const imageDataUrl = await blobToBase64(imageBlob);
+              element.setAttribute(
+                "style",
+                styleAttribute.replace(backgroundImageRegExp, imageDataUrl)
+              );
+            }
+          } catch (e) {
+            console.warn(`Failed to fetch background image (${url}): ${e}`);
           }
         })()
       );

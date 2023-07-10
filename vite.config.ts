@@ -47,7 +47,7 @@ export default defineConfig({
           "GM_webRequest",
           "GM_xmlhttpRequest",
         ],
-        connect: ["weread.qq.com", "*"],
+        connect: ["weread.qq.com", "tencent-cloud.com", "*"],
         "run-at": "document-start",
       },
     }),
