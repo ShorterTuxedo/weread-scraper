@@ -24,6 +24,8 @@ Export WeRead books as HTML files.
 
 7. Click **Set Click Interval** to set the automatic page turning time interval, in milliseconds (ms).
 
+8. Click **Inline Images** to set whether images are inlined in the document, that is, whether images can be loaded offline. Where ✔ indicates that the feature is enabled, and ✘ indicates that the feature is disabled.
+
 ## Local Build
 
 ```bash
