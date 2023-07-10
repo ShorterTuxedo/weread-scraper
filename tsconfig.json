@@ -3,6 +3,7 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
+    "types": [],
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "Bundler",
     "strict": true,
@@ -16,5 +17,10 @@
     "noImplicitReturns": true,
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
 }

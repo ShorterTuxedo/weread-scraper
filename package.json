@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/html-minifier-terser": "^7.0.0",
+    "@types/node": "^20.4.1",
     "@types/wicg-file-system-access": "^2020.9.6",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
