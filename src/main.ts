@@ -75,7 +75,9 @@ const preRenderContainerObserver = new MutationObserver(async () => {
     return;
   }
   scraperPageStore.setState({
-    preRenderContainer,
+    preRenderContainer: preRenderContainer.cloneNode(
+      true
+    ) as typeof preRenderContainer,
   });
 });
 
@@ -249,9 +251,7 @@ function subscribePageContentLoaded() {
       // 页面加载完毕时，preRenderContainer 才是最终我们需要的结果
       const { preRenderContainer } = scraperPageStore.getState();
       if (preRenderContainer) {
-        await feed(
-          preRenderContainer.cloneNode(true) as typeof preRenderContainer
-        );
+        await feed(preRenderContainer);
       } else {
         console.warn("Failed to find .preRenderContainer element.");
       }
