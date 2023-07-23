@@ -176,13 +176,13 @@ function scrapingOn() {
       },
       // 订阅微信读书的章节内容获取请求
       // 发出这个请求表示内容为新章节，否则为接续页
+      // chapter/e_* 是 epub 格式，chapter/t_* 是 txt 格式
+      // 将请求重定向到一个没有被加入到 @match 的网址会让请求正常发出
+      // 但仍可以正常触发回调函数
       {
-        selector: "https://weread.qq.com/web/book/chapter/e_*",
+        selector: "https://weread.qq.com/web/book/chapter/*",
         action: {
-          redirect: {
-            from: "(.*)",
-            to: "$1",
-          },
+          redirect: "https://chapter.invalid",
         },
       },
     ],
@@ -309,15 +309,14 @@ function getPageContentLoadedCleanUpFunction(unsub: () => void) {
 async function feed(preRenderContainer: Element) {
   // 样式处理，样式表只添加一次即可
   if (styleElement.childNodes.length === 0) {
-    const preRenderStyleElement = preRenderContainer.querySelector("style");
-    if (preRenderStyleElement?.childNodes.length) {
-      // 添加预设样式和微信读书样式
-      styleElement.append(stylePreset, preRenderStyleElement.innerHTML);
-      // 对样式进行 minification
-      styleElement.outerHTML = await minify(styleElement.outerHTML, {
-        minifyCSS: true,
-      });
-    }
+    const preRenderStyleElement =
+      preRenderContainer.querySelector("style") || styleElement;
+    // 添加预设样式和微信读书样式
+    styleElement.append(stylePreset, preRenderStyleElement.innerHTML);
+    // 对样式进行 minification
+    styleElement.outerHTML = await minify(styleElement.outerHTML, {
+      minifyCSS: true,
+    });
   }
   // 内容处理
   const preRenderContent = preRenderContainer.querySelector(
