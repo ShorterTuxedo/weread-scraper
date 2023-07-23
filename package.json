@@ -22,7 +22,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "npu": "npm-check-updates -u"
+    "ncu": "ncu -u && npm i"
   },
   "devDependencies": {
     "@types/html-minifier-terser": "^7.0.0",
