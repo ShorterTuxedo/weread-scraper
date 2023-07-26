@@ -1,33 +1,11 @@
 import { defineConfig } from "vite";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
 import monkey, { cdn } from "vite-plugin-monkey";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   publicDir: false,
   plugins: [
-    nodePolyfills(),
     monkey({
-      build: {
-        externalGlobals: {
-          "zustand/vanilla": cdn.jsdelivrFastly(
-            "zustandVanilla",
-            "umd/vanilla.production.js"
-          ),
-          "zustand/middleware": cdn.jsdelivrFastly(
-            "zustandMiddleware",
-            "umd/middleware.production.js"
-          ),
-          "html-minifier-terser": cdn.jsdelivrFastly(
-            "HTMLMinifier",
-            "dist/htmlminifier.umd.bundle.min.js"
-          ),
-          "@trim21/gm-fetch": cdn.jsdelivrFastly(
-            "GM_fetch",
-            "dist/gm_fetch.min.js"
-          ),
-        },
-      },
       entry: "src/main.ts",
       userscript: {
         name: "WeRead Scraper",
@@ -45,9 +23,33 @@ export default defineConfig({
           "GM_deleteValue",
           "GM_webRequest",
           "GM_xmlhttpRequest",
+          "GM_getResourceURL",
         ],
         connect: ["weread.qq.com", "tencent-cloud.com", "*"],
         "run-at": "document-start",
+      },
+      build: {
+        externalGlobals: {
+          "minify-html-wasm": cdn.jsdelivrFastly(
+            "wasm_bindgen",
+            "dist/no-modules/index.min.js"
+          ),
+          "zustand/vanilla": cdn.jsdelivrFastly(
+            "zustandVanilla",
+            "umd/vanilla.production.js"
+          ),
+          "zustand/middleware": cdn.jsdelivrFastly(
+            "zustandMiddleware",
+            "umd/middleware.production.js"
+          ),
+          "@trim21/gm-fetch": cdn.jsdelivrFastly(
+            "GM_fetch",
+            "dist/gm_fetch.min.js"
+          ),
+        },
+        externalResource: {
+          "minify-html-wasm/no-modules/wasm?url": cdn.jsdelivrFastly(),
+        },
       },
     }),
   ],
