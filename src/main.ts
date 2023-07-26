@@ -74,6 +74,8 @@ const preRenderContainerObserver = new MutationObserver(async () => {
   if (!preRenderContent) {
     return;
   }
+  let chapterTitle = document.querySelector("span.readerTopBar_title_chapter").innerText;
+  preRenderContent.setAttribute("data-chapter-title",chapterTitle);
   scraperPageStore.setState({
     preRenderContainer: preRenderContainer.cloneNode(
       true
