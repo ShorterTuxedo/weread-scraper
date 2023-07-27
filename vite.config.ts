@@ -1,33 +1,12 @@
 import { defineConfig } from "vite";
-import { nodePolyfills } from "vite-plugin-node-polyfills";
 import monkey, { cdn } from "vite-plugin-monkey";
+import { packages } from "./package-lock.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   publicDir: false,
   plugins: [
-    nodePolyfills(),
     monkey({
-      build: {
-        externalGlobals: {
-          "zustand/vanilla": cdn.jsdelivrFastly(
-            "zustandVanilla",
-            "umd/vanilla.production.js"
-          ),
-          "zustand/middleware": cdn.jsdelivrFastly(
-            "zustandMiddleware",
-            "umd/middleware.production.js"
-          ),
-          "html-minifier-terser": cdn.jsdelivrFastly(
-            "HTMLMinifier",
-            "dist/htmlminifier.umd.bundle.min.js"
-          ),
-          "@trim21/gm-fetch": cdn.jsdelivrFastly(
-            "GM_fetch",
-            "dist/gm_fetch.min.js"
-          ),
-        },
-      },
       entry: "src/main.ts",
       userscript: {
         name: "WeRead Scraper",
@@ -46,9 +25,39 @@ export default defineConfig({
           "GM_webRequest",
           "GM_xmlhttpRequest",
         ],
-        connect: ["weread.qq.com", "tencent-cloud.com", "*"],
+        connect: [
+          "fastly.jsdelivr.net",
+          "weread.qq.com",
+          "tencent-cloud.com",
+          "*",
+        ],
         "run-at": "document-start",
+      },
+      build: {
+        externalGlobals: {
+          "minify-html-wasm": cdn.jsdelivrFastly(
+            "wasm_bindgen",
+            "dist/no-modules/index.min.js"
+          ),
+          "zustand/vanilla": cdn.jsdelivrFastly(
+            "zustandVanilla",
+            "umd/vanilla.production.js"
+          ),
+          "zustand/middleware": cdn.jsdelivrFastly(
+            "zustandMiddleware",
+            "umd/middleware.production.js"
+          ),
+          "@trim21/gm-fetch": cdn.jsdelivrFastly(
+            "GM_fetch",
+            "dist/gm_fetch.min.js"
+          ),
+        },
       },
     }),
   ],
+  define: {
+    __WASM_URL__: JSON.stringify(
+      `https://fastly.jsdelivr.net/npm/minify-html-wasm@${packages["node_modules/minify-html-wasm"].version}/dist/no-modules/index_bg.wasm`
+    ),
+  },
 });

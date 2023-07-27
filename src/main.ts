@@ -5,6 +5,7 @@ import {
   GM_registerMenuCommand,
   GM_unregisterMenuCommand,
   GM_webRequest,
+  GM_xmlhttpRequest,
 } from "$";
 import GM_fetch from "@trim21/gm-fetch";
 import { createStore } from "zustand/vanilla";
@@ -14,36 +15,31 @@ import {
   StateStorage,
   subscribeWithSelector,
 } from "zustand/middleware";
-import { minify } from "html-minifier-terser";
 import { html, css } from "code-tag";
+import init, { minify } from "minify-html-wasm";
 
 // 预设样式
 // TODO: Prevent images from spanning across pages
 const stylePreset = css`
   @font-face {
     font-family: "汉仪旗黑50S";
-    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_50S.woff2")
-      format("woff2");
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_50S.woff2");
   }
   @font-face {
     font-family: "汉仪旗黑65S";
-    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_65S.woff2")
-      format("woff2");
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYQiHei_65S.woff2");
   }
   @font-face {
     font-family: "汉仪楷体";
-    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYKaiTiS.woff2")
-      format("woff2");
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/HYKaiTiS.woff2");
   }
   @font-face {
     font-family: "方正仿宋";
-    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/FZFSJW.woff2")
-      format("woff2");
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/FZFSJW.woff2");
   }
   @font-face {
     font-family: "PingFang SC";
-    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/PingFang-SC-Regular.woff2")
-      format("woff2");
+    src: url("https://fastly.jsdelivr.net/gh/Sec-ant/weread-scraper/public/fonts/PingFang-SC-Regular.woff2");
   }
   .readerChapterContent {
     break-after: page;
@@ -60,6 +56,39 @@ const bodyElement = document.createElement("body");
 headElement.insertAdjacentHTML("beforeend", html`<meta charset="utf-8" />`);
 headElement.append(styleElement);
 htmlElement.append(headElement, bodyElement);
+
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+const wasmInitPromise = new Promise<Response>((resolve, reject) => {
+  GM_xmlhttpRequest<ReadableStream<Uint8Array>>({
+    method: "GET",
+    url: __WASM_URL__,
+    responseType: "stream",
+    onloadstart({ status, statusText, response }) {
+      if (status === 0) {
+        resolve(
+          new Response(response as ReadableStream<Uint8Array>, {
+            headers: {
+              "Content-Type": "application/wasm",
+            },
+          })
+        );
+        return;
+      }
+      reject(statusText);
+    },
+    onerror({ statusText }) {
+      reject(statusText);
+    },
+    onabort() {
+      reject("Request is aborted.");
+    },
+    ontimeout() {
+      reject("Request timeout.");
+    },
+  });
+}).then(init);
 
 // 初始化一个 Mutation Observer 用来监测书籍页面内容 DOM 元素 preRenderContainer 的出现
 const preRenderContainerObserver = new MutationObserver(async () => {
@@ -316,9 +345,12 @@ async function feed(preRenderContainer: Element) {
     // 添加预设样式和微信读书样式
     styleElement.append(stylePreset, preRenderStyleElement.innerHTML);
     // 对样式进行 minification
-    styleElement.outerHTML = await minify(styleElement.outerHTML, {
-      minifyCSS: true,
-    });
+    await wasmInitPromise;
+    styleElement.outerHTML = decoder.decode(
+      minify(encoder.encode(styleElement.outerHTML), {
+        minify_css: true,
+      })
+    );
   }
   // 内容处理
   const preRenderContent = preRenderContainer.querySelector(
@@ -392,6 +424,7 @@ async function feed(preRenderContainer: Element) {
   recursivelyRemoveDataAttr(preRenderContent);
   // 将多个连续的 span 元素合并为一个，减少文件体积
   collapseSpans(preRenderContent);
+
   // 如果是新章节，页面内容连带容器经过 minification 后插入到 body 元素最后
   if (scraperPageStore.getState().isNewChapter) {
     // 移除重复的 id
@@ -399,24 +432,20 @@ async function feed(preRenderContainer: Element) {
     // 添加章节内容 class 用于应用作用于章节的样式
     preRenderContent.classList.add("readerChapterContent");
     // 将这个章节容器插入到 body 末尾
+    await wasmInitPromise;
     bodyElement.insertAdjacentHTML(
       "beforeend",
-      await minify(preRenderContent.outerHTML, {
-        collapseWhitespace: true,
-        removeComments: true,
-      })
+      decoder.decode(minify(encoder.encode(preRenderContent.outerHTML), {}))
     );
   }
   // 如果不是新章节，页面内容 minification 后插入到最后一个容器最后
   // TODO: 是否应该合并 <div data-wr-bd="1"> ?
   else {
     // 将容器内容插入到最后一个章节容器末尾
+    await wasmInitPromise;
     bodyElement.lastElementChild?.insertAdjacentHTML(
       "beforeend",
-      await minify(preRenderContent.innerHTML, {
-        collapseWhitespace: true,
-        removeComments: true,
-      })
+      decoder.decode(minify(encoder.encode(preRenderContent.innerHTML), {}))
     );
   }
 }
