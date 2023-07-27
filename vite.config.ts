@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import monkey, { cdn } from "vite-plugin-monkey";
+import { packages } from "./package-lock.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -23,9 +24,13 @@ export default defineConfig({
           "GM_deleteValue",
           "GM_webRequest",
           "GM_xmlhttpRequest",
-          "GM_getResourceURL",
         ],
-        connect: ["weread.qq.com", "tencent-cloud.com", "*"],
+        connect: [
+          "fastly.jsdelivr.net",
+          "weread.qq.com",
+          "tencent-cloud.com",
+          "*",
+        ],
         "run-at": "document-start",
       },
       build: {
@@ -47,10 +52,12 @@ export default defineConfig({
             "dist/gm_fetch.min.js"
           ),
         },
-        externalResource: {
-          "minify-html-wasm/no-modules/wasm?url": cdn.jsdelivrFastly(),
-        },
       },
     }),
   ],
+  define: {
+    __WASM_URL__: JSON.stringify(
+      `https://fastly.jsdelivr.net/npm/minify-html-wasm@${packages["node_modules/minify-html-wasm"].version}/dist/no-modules/index_bg.wasm`
+    ),
+  },
 });

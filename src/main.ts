@@ -5,6 +5,7 @@ import {
   GM_registerMenuCommand,
   GM_unregisterMenuCommand,
   GM_webRequest,
+  GM_xmlhttpRequest,
 } from "$";
 import GM_fetch from "@trim21/gm-fetch";
 import { createStore } from "zustand/vanilla";
@@ -16,7 +17,6 @@ import {
 } from "zustand/middleware";
 import { html, css } from "code-tag";
 import init, { minify } from "minify-html-wasm";
-import minifyHtmlWasmUrl from "minify-html-wasm/no-modules/wasm?url";
 
 // 预设样式
 // TODO: Prevent images from spanning across pages
@@ -59,7 +59,30 @@ htmlElement.append(headElement, bodyElement);
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
-await init(minifyHtmlWasmUrl);
+
+const wasmInitPromise = new Promise<Response>((resolve, reject) => {
+  GM_xmlhttpRequest<ReadableStream<Uint8Array>>({
+    method: "GET",
+    url: __WASM_URL__,
+    responseType: "stream",
+    onloadstart({ status, statusText, response }) {
+      if (status === 0) {
+        resolve(new Response(response as ReadableStream<Uint8Array>));
+        return;
+      }
+      reject(statusText);
+    },
+    onerror({ statusText }) {
+      reject(statusText);
+    },
+    onabort() {
+      reject("Request is aborted.");
+    },
+    ontimeout() {
+      reject("Request timeout.");
+    },
+  });
+}).then(init);
 
 // 初始化一个 Mutation Observer 用来监测书籍页面内容 DOM 元素 preRenderContainer 的出现
 const preRenderContainerObserver = new MutationObserver(async () => {
@@ -314,6 +337,7 @@ async function feed(preRenderContainer: Element) {
     // 添加预设样式和微信读书样式
     styleElement.append(stylePreset, preRenderStyleElement.innerHTML);
     // 对样式进行 minification
+    await wasmInitPromise;
     styleElement.outerHTML = decoder.decode(
       minify(encoder.encode(styleElement.outerHTML), {
         minify_css: true,
@@ -400,6 +424,7 @@ async function feed(preRenderContainer: Element) {
     // 添加章节内容 class 用于应用作用于章节的样式
     preRenderContent.classList.add("readerChapterContent");
     // 将这个章节容器插入到 body 末尾
+    await wasmInitPromise;
     bodyElement.insertAdjacentHTML(
       "beforeend",
       decoder.decode(minify(encoder.encode(preRenderContent.outerHTML), {}))
@@ -409,6 +434,7 @@ async function feed(preRenderContainer: Element) {
   // TODO: 是否应该合并 <div data-wr-bd="1"> ?
   else {
     // 将容器内容插入到最后一个章节容器末尾
+    await wasmInitPromise;
     bodyElement.lastElementChild?.insertAdjacentHTML(
       "beforeend",
       decoder.decode(minify(encoder.encode(preRenderContent.innerHTML), {}))
