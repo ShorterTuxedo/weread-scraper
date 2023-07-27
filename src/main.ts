@@ -67,7 +67,13 @@ const wasmInitPromise = new Promise<Response>((resolve, reject) => {
     responseType: "stream",
     onloadstart({ status, statusText, response }) {
       if (status === 0) {
-        resolve(new Response(response as ReadableStream<Uint8Array>));
+        resolve(
+          new Response(response as ReadableStream<Uint8Array>, {
+            headers: {
+              "Content-Type": "application/wasm",
+            },
+          })
+        );
         return;
       }
       reject(statusText);
